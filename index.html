@@ -164,6 +164,7 @@ var B = {
 /* ---------------- 指针 ---------------- */
 var ptr = { x: 0, y: 0, active: false, last: 0, down: 0, downAt: 0, moved: false };
 var lastAct = 0;
+var sleepLimit = 26000;   // 第一次不理它，让它撑着别睡；戳过一次之后 7.2s 就睡
 
 /* ---------------- 气泡 ---------------- */
 var say = { text: '', t0: -9999, dur: 0, a: 0 };
@@ -245,6 +246,7 @@ function spark(px, py, n, power){
 function onTap(px, py){
   initAudio();
   lastAct = now;
+  sleepLimit = 7200;
 
   // 睡着被戳
   if(B.asleep){
@@ -355,10 +357,10 @@ function update(dt, ts){
   var idle = now - lastAct;
 
   // 睡着 / 醒来
-  if(!ptr.down && idle > 7200 && !B.asleep){
+  if(!ptr.down && idle > sleepLimit && !B.asleep){
     B.asleep = true; lastLine = '';
   }
-  if(idle < 7200 && B.asleep && ptr.down){
+  if(idle < sleepLimit && B.asleep && ptr.down){
     B.asleep = false;
   }
   B.sleepK += ((B.asleep ? 1 : 0) - B.sleepK) * Math.min(1, dt * 2.4);
